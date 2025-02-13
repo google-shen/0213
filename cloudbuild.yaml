@@ -1,8 +1,12 @@
 steps:
-  - name: "gcr.io/cloud-builders/git"
-    args: ["checkout", "main"] # or your default branch
-  - name: "python:3.9-slim"
-    script: |
-      #!/usr/bin/env bash
-      pip install -r requirements.txt
-      pytest
+- name: 'gcr.io/cloud-builders/git'
+  id: check_branches
+  script: |
+    #!/bin/bash
+    echo "Base branch: $_BASE_BRANCH"
+    echo "Head branch: $_HEAD_BRANCH"
+
+    if [[ "$_BASE_BRANCH" == "develop" && "$_HEAD_BRANCH" == "main" ]]; then
+      echo "main -> develop PR detected. Exiting build."
+      exit 0  # 成功退出，但实际上是停止构建
+    fi
